@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  recipeapipython:
+    build:
+      context: .
+    ports:
+      - 8000:8000
+    command: sh -c "python manage.py runservicer 0.0.0.0:8000"
