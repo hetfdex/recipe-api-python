@@ -3,68 +3,96 @@ from django.contrib.auth import get_user_model
 
 
 class ModelTests(TestCase):
+    def setUp(self):
 
-    def test_create_super_user_valid_email(self):
+        self.email = 'test@test.com'
+        self.emailUpper = 'test@TEST.COM'
+        self.password = 'Abcde12345!'
+
+    def test_create_superuser_valid_email(self):
         """
-        Creates a super user from a valid email
+        Creates a superuser from a valid email
         """
-        email = 'test@test.com'
-        password = 'Abcde12345!'
-        user = get_user_model().objects.create_super_user(
-            email=email,
-            password=password,
+        user = get_user_model().objects.create_superuser(
+            email=self.email,
+            password=self.password,
         )
 
-        self.assertEqual(user.email, email)
-        self.assertTrue(user.check_password(password))
+        self.assertEqual(user.email, self.email)
+        self.assertTrue(user.check_password(self.password))
         self.assertTrue(user.is_superuser)
         self.assertTrue(user.is_staff)
+
+    def test_create_superuser_normalized_email(self):
+        """
+        Normalizes the email of the superuser
+        """
+        user = get_user_model().objects.create_superuser(
+            email=self.emailUpper,
+            password=self.password,
+        )
+
+        self.assertEqual(user.email, self.emailUpper.lower())
+
+    def test_create_superuser_null_email(self):
+        """
+        Does not create a superuser from a null email
+        """
+        with self.assertRaises(ValueError):
+            get_user_model().objects.create_superuser(
+                None,
+                password=self.password,
+            )
+
+    def test_create_superuser_empty_email(self):
+        """
+        Does not create a superuser from an empty email
+        """
+        with self.assertRaises(ValueError):
+            get_user_model().objects.create_superuser(
+                '',
+                password=self.password,
+            )
 
     def test_create_user_valid_email(self):
         """
         Creates a user from a valid email
         """
-        email = 'test@test.com'
-        password = 'Abcde12345!'
         user = get_user_model().objects.create_user(
-            email=email,
-            password=password,
+            email=self.email,
+            password=self.password,
         )
 
-        self.assertEqual(user.email, email)
-        self.assertTrue(user.check_password(password))
+        self.assertEqual(user.email, self.email)
+        self.assertTrue(user.check_password(self.password))
 
     def test_create_user_normalized_email(self):
         """
-        Normalizes the email string
+        Normalizes the email of the user
         """
-        email = 'test@TEST.COM'
-        password = 'Abcde12345!'
         user = get_user_model().objects.create_user(
-            email=email,
-            password=password,
+            email=self.emailUpper,
+            password=self.password,
         )
 
-        self.assertEqual(user.email, email.lower())
+        self.assertEqual(user.email, self.emailUpper.lower())
 
     def test_create_user_null_email(self):
         """
         Does not create a user from a null email
         """
-        password = 'Abcde12345!'
         with self.assertRaises(ValueError):
             get_user_model().objects.create_user(
                 None,
-                password=password,
+                password=self.password,
             )
 
     def test_create_user_empty_email(self):
         """
         Does not create a user from an empty email
         """
-        password = 'Abcde12345!'
         with self.assertRaises(ValueError):
             get_user_model().objects.create_user(
                 '',
-                password=password,
+                password=self.password,
             )
